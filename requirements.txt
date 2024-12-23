@@ -1,0 +1,10 @@
+pydantic
+python-multipart
+fastapi
+uvicorn
+httpx
+psycopg2-binary
+sqlalchemy
+sqlalchemy-stubs
+urllib3
+minio

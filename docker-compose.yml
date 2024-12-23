@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: meme_db
+      POSTGRES_USER: meme_user
+      POSTGRES_PASSWORD: 12345678
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    volumes:
+      - datastore:/data
+    environment:
+      - "MINIO_ACCESS_KEY=minio"
+      - "MINIO_SECRET_KEY=12345678"
+    command: server /data
+
+  web:
+    build: .
+    depends_on:
+      - db
+      - minio
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://meme_user:12345678@127.0.0.1:5432/meme_db"
+      MINIO_URL: "http://minio:9000"
+      MINIO_ACCESS_KEY: "meme_images"
+      MINIO_SECRET_KEY: "12345678"
+    command: uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+volumes:
+  postgres_data:
